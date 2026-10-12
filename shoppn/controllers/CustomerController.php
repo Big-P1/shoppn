@@ -1,28 +1,53 @@
 <?php
-require_once '../classes/CustomerClass.php';
+require_once __DIR__ . '/../classes/CustomerClass.php';
 
 class CustomerController {
 
-    public function register_customer($name, $email, $password, $country, $city, $contact) {
-        $customer = new Customer();
+    private $customer;
 
-        if ($customer->email_exists($email)) {
-            return false;
+    public function __construct() {
+        $this->customer = new Customer();
+    }
+
+    public function register($data) {
+        if ($this->customer->emailExists($data['email'])) {
+            return ['success' => false, 'error' => 'Email already registered'];
         }
 
-        $password = password_hash($password, PASSWORD_DEFAULT);
+        $hash = password_hash($data['password'], PASSWORD_BCRYPT);
 
-        return $customer->add_customer($name, $email, $password, $country, $city, $contact);
+        $id = $this->customer->addCustomer(
+            $data['name'],
+            $data['email'],
+            $hash,
+            $data['country'],
+            $data['city'],
+            $data['contact'],
+            $data['image'] ?? null
+        );
+
+        if ($id === false) {
+            return ['success' => false, 'error' => 'Registration failed. Please try again.'];
+        }
+
+        return [
+            'success' => true,
+            'customer' => $this->customer->getCustomerById($id)
+        ];
     }
-    public function login($email, $password) {
-    $customer = new Customer();
-    $user = $customer->getCustomerByEmail($email);
 
-    if ($user && password_verify($password, $user['customer_pass'])) {
-        return $user;
+    public function login($email, $pass) {
+        $row = $this->customer->login($email, $pass);
+
+        if ($row === false) {
+            return ['success' => false, 'error' => 'Invalid email or password'];
+        }
+
+        return ['success' => true, 'customer' => $row];
     }
 
-    return false;
+    public function getCustomerById($id) {
+        return $this->customer->getCustomerById($id);
     }
 }
 ?>

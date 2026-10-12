@@ -1,64 +1,86 @@
 <?php
-include 'layout/header.php';
-?>
+require_once __DIR__ . '/../core/core.php';
 
-<h2>Customer Registration</h2>
-
-<?php
-if (isset($_GET['error'])) {
-    echo "<p>" . $_GET['error'] . "</p>";
+if (is_logged_in()) {
+    redirect(BASE_URL . '/views/account/my_account.php');
 }
+
+$pageTitle = 'Create Account';
+include __DIR__ . '/layout/header.php';
+
+$countries = ['Ghana', 'Nigeria', 'Kenya', 'South Africa', 'Ivory Coast', 'Togo', 'United States', 'United Kingdom', 'Canada', 'Other'];
 ?>
 
-<form action="../actions/register_action.php" method="POST" onsubmit="return validateForm()">
-    <label>Name:</label>
-    <input type="text" name="name" required><br><br>
+<div class="form-card">
+    <h2>Create Your Account</h2>
 
-    <label>Email:</label>
-    <input type="email" name="email" required><br><br>
+    <?php include __DIR__ . '/layout/flash.php'; ?>
 
-    <label>Password:</label>
-    <input type="password" name="password" required><br><br>
+    <form
+        id="register-form"
+        action="<?php echo BASE_URL; ?>/actions/register_action.php"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+        <div class="field">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" maxlength="100" required>
+            <span class="field-error" data-error-for="name"></span>
+        </div>
 
-    <label>Country:</label>
-    <input type="text" name="country" required><br><br>
+        <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" maxlength="50" required>
+            <span class="field-error" data-error-for="email"></span>
+        </div>
 
-    <label>City:</label>
-    <input type="text" name="city" required><br><br>
+        <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+            <span class="field-error" data-error-for="password"></span>
+            <div class="password-rules">
+                <p data-rule="length">&#9675; At least 8 characters</p>
+                <p data-rule="uppercase">&#9675; One uppercase letter</p>
+                <p data-rule="lowercase">&#9675; One lowercase letter</p>
+                <p data-rule="number">&#9675; One number</p>
+                <p data-rule="special">&#9675; One special character (!@#$% etc.)</p>
+            </div>
+        </div>
 
-    <label>Contact:</label>
-    <input type="text" name="contact" required><br><br>
+        <div class="field">
+            <label for="country">Country</label>
+            <select id="country" name="country" required>
+                <option value="">Select country</option>
+                <?php foreach ($countries as $country) { ?>
+                    <option value="<?php echo htmlspecialchars($country); ?>"><?php echo htmlspecialchars($country); ?></option>
+                <?php } ?>
+            </select>
+            <span class="field-error" data-error-for="country"></span>
+        </div>
 
-    <button type="submit">Register</button>
-</form><script>
-function validateForm() {
-    let name = document.getElementsByName("name")[0].value;
-    let email = document.getElementsByName("email")[0].value;
-    let password = document.getElementsByName("password")[0].value;
-    let country = document.getElementsByName("country")[0].value;
-    let city = document.getElementsByName("city")[0].value;
-    let contact = document.getElementsByName("contact")[0].value;
+        <div class="field">
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" maxlength="30" required>
+            <span class="field-error" data-error-for="city"></span>
+        </div>
 
-    if (name == "" || email == "" || password == "" ||
-        country == "" || city == "" || contact == "") {
-        alert("Please fill in all required fields.");
-        return false;
-    }
+        <div class="field">
+            <label for="contact">Contact Number</label>
+            <input type="text" id="contact" name="contact" maxlength="15" required>
+            <span class="field-error" data-error-for="contact"></span>
+        </div>
 
-    if (!email.includes("@")) {
-        alert("Please enter a valid email.");
-        return false;
-    }
+        <div class="field">
+            <label for="customer_image">Profile Image (optional)</label>
+            <input type="file" id="customer_image" name="customer_image" accept="image/jpeg,image/png,image/gif,image/webp">
+            <span class="field-hint">JPG, PNG, GIF or WEBP, up to 2MB.</span>
+            <span class="field-error" data-error-for="customer_image"></span>
+        </div>
 
-    if (password.length < 6) {
-        alert("Password must be at least 6 characters.");
-        return false;
-    }
+        <button type="submit" data-loading="Creating account...">Create Account</button>
+    </form>
 
-    return true;
-}
-</script>
+    <p class="form-footer">Already have an account? <a href="<?php echo BASE_URL; ?>/views/login.php">Login</a></p>
+</div>
 
-<?php
-include 'layout/footer.php';
-?>
+<?php include __DIR__ . '/layout/footer.php'; ?>
