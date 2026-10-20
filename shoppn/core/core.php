@@ -36,6 +36,22 @@ function redirect($url) {
     exit();
 }
 
+function redirect_back($fallback) {
+    $referer = $_SERVER['HTTP_REFERER'] ?? '';
+    $parts = $referer !== '' ? parse_url($referer) : false;
+
+    if ($parts && isset($parts['scheme'], $parts['host']) && in_array($parts['scheme'], ['http', 'https'], true)) {
+        $refererHost = strtolower($parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : ''));
+        $currentHost = strtolower($_SERVER['HTTP_HOST'] ?? '');
+
+        if ($refererHost === $currentHost) {
+            redirect($referer);
+        }
+    }
+
+    redirect($fallback);
+}
+
 function upload_image($field, $targetDir, $maxBytes = 2097152) {
     $allowed = [
         'image/jpeg' => 'jpg',

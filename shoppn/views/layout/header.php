@@ -1,5 +1,11 @@
 <?php
 require_once __DIR__ . '/../../core/core.php';
+require_once __DIR__ . '/../../controllers/CartController.php';
+
+$headerCart = new CartController();
+$headerCartIp = get_ip();
+$headerCartCount = $headerCart->getCartCount($headerCartIp);
+$headerCartTotal = $headerCart->getCartTotal($headerCartIp);
 
 $pageTitle = isset($pageTitle) ? $pageTitle . ' | Shoppn' : 'Shoppn';
 $searchValue = isset($_GET['user_query']) ? trim($_GET['user_query']) : '';
@@ -50,5 +56,15 @@ $searchValue = isset($_GET['user_query']) ? trim($_GET['user_query']) : '';
         </nav>
     </div>
 </header>
+
+<div class="cart-bar">
+    <div class="cart-bar-inner">
+        <span>Shopping Cart &mdash; Total Items: <strong><?php echo (int) $headerCartCount; ?></strong></span>
+        <span class="cart-bar-sep">|</span>
+        <span>Total Price: <strong>GH&#8373; <?php echo number_format($headerCartTotal, 2); ?></strong></span>
+        <span class="cart-bar-sep">|</span>
+        <a href="<?php echo BASE_URL; ?>/views/cart.php">Go to Cart</a>
+    </div>
+</div>
 
 <div class="wrap">

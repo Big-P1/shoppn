@@ -210,7 +210,74 @@
         });
     }
 
+    const qtyRegex = /^[1-9][0-9]?$/;
+
+    function showCartError(message) {
+        const box = document.getElementById('cart-error');
+        if (!box) { return; }
+        box.textContent = message;
+        box.hidden = false;
+        box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function clearCartError() {
+        const box = document.getElementById('cart-error');
+        if (box) {
+            box.textContent = '';
+            box.hidden = true;
+        }
+        document.querySelectorAll('.qty-input.invalid').forEach(function (input) {
+            input.classList.remove('invalid');
+        });
+    }
+
+    function attachCart() {
+        const updateForm = document.getElementById('update-form');
+        const removeForm = document.getElementById('remove-form');
+
+        if (updateForm) {
+            updateForm.addEventListener('submit', function (event) {
+                clearCartError();
+                let firstBad = null;
+
+                document.querySelectorAll('input[form="update-form"][name="qty[]"]').forEach(function (input) {
+                    input.value = input.value.trim();
+                    if (!qtyRegex.test(input.value)) {
+                        input.classList.add('invalid');
+                        if (!firstBad) { firstBad = input; }
+                    }
+                });
+
+                if (firstBad) {
+                    event.preventDefault();
+                    showCartError('Quantity must be a whole number between 1 and 99.');
+                    firstBad.focus();
+                }
+            });
+        }
+
+        if (removeForm) {
+            removeForm.addEventListener('submit', function (event) {
+                clearCartError();
+                const checked = document.querySelectorAll('input[form="remove-form"][name="remove[]"]:checked');
+
+                if (checked.length === 0) {
+                    event.preventDefault();
+                    showCartError('Tick at least one item to remove.');
+                }
+            });
+        }
+
+        document.querySelectorAll('.qty-input').forEach(function (input) {
+            input.addEventListener('input', function () {
+                input.classList.remove('invalid');
+            });
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+        attachCart();
+
         Object.keys(validators).forEach(function (id) {
             const form = document.getElementById(id);
             if (form) { attach(form, validators[id]); }

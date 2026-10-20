@@ -4,6 +4,11 @@ if (isset($_SESSION['success'])) {
     unset($_SESSION['success']);
 }
 
+if (isset($_SESSION['info'])) {
+    echo '<div class="alert alert-info">' . htmlspecialchars($_SESSION['info']) . '</div>';
+    unset($_SESSION['info']);
+}
+
 if (isset($_SESSION['error'])) {
     echo '<div class="alert alert-error">' . htmlspecialchars($_SESSION['error']) . '</div>';
     unset($_SESSION['error']);
