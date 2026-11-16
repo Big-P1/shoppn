@@ -36,5 +36,25 @@ class CartController {
     public function updateQty($product_id, $new_qty, $ip) {
         return $this->cart->updateQty($product_id, $new_qty, $ip);
     }
+
+    public function processPayment($customer_id, $ip, $reference, $amount) {
+        return $this->cart->processPayment($customer_id, $ip, $reference, $amount);
+    }
+
+    public function getOrderById($order_id) {
+        return $this->cart->getOrderById($order_id);
+    }
+
+    public function getOrdersByCustomer($customer_id) {
+        return $this->cart->getOrdersByCustomer($customer_id);
+    }
+
+    public function getRecentlyPurchased($customer_id, $limit = 4) {
+        return $this->cart->getRecentlyPurchased($customer_id, $limit);
+    }
+
+    public function getRecommendedProducts($customer_id, $limit = 4) {
+        return $this->cart->getRecommendedProducts($customer_id, $limit);
+    }
 }
 ?>

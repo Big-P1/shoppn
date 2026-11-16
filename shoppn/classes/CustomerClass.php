@@ -85,5 +85,54 @@ class Customer extends Database {
 
         return false;
     }
+
+    public function updateCustomer($id, $name, $country, $city, $contact, $image = null) {
+        try {
+            $stmt = $this->conn->prepare(
+                "UPDATE customer
+                SET customer_name = ?, customer_country = ?, customer_city = ?, customer_contact = ?,
+                    customer_image = COALESCE(?, customer_image)
+                WHERE customer_id = ?"
+            );
+
+            $stmt->bind_param("sssssi", $name, $country, $city, $contact, $image, $id);
+            $ok = $stmt->execute();
+            $stmt->close();
+
+            return $ok;
+        } catch (mysqli_sql_exception $e) {
+            error_log('updateCustomer failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updatePassword($id, $hash) {
+        try {
+            $stmt = $this->conn->prepare("UPDATE customer SET customer_pass = ? WHERE customer_id = ?");
+            $stmt->bind_param("si", $hash, $id);
+            $ok = $stmt->execute();
+            $stmt->close();
+
+            return $ok;
+        } catch (mysqli_sql_exception $e) {
+            error_log('updatePassword failed: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function deleteCustomer($id) {
+        try {
+            $stmt = $this->conn->prepare("DELETE FROM customer WHERE customer_id = ?");
+            $stmt->bind_param("i", $id);
+            $ok = $stmt->execute();
+            $deleted = $ok && $stmt->affected_rows > 0;
+            $stmt->close();
+
+            return $deleted;
+        } catch (mysqli_sql_exception $e) {
+            error_log('deleteCustomer failed: ' . $e->getMessage());
+            return false;
+        }
+    }
 }
 ?>

@@ -48,6 +48,15 @@ include __DIR__ . '/../layout/header.php';
         <dd><?php echo is_admin() ? 'Administrator' : 'Customer'; ?></dd>
     </dl>
 
+    <div class="account-links">
+        <a class="btn" href="<?php echo BASE_URL; ?>/views/account/my_orders.php">My Orders</a>
+        <a class="btn btn-outline" href="<?php echo BASE_URL; ?>/views/account/edit_account.php">Edit Details</a>
+        <a class="btn btn-outline" href="<?php echo BASE_URL; ?>/views/account/change_pass.php">Change Password</a>
+        <?php if (!is_admin()) { ?>
+            <a class="btn btn-outline btn-danger" href="<?php echo BASE_URL; ?>/views/account/delete_account.php">Delete Account</a>
+        <?php } ?>
+    </div>
+
     <p class="form-footer"><a href="<?php echo BASE_URL; ?>/index.php">Continue shopping</a></p>
 </div>
 

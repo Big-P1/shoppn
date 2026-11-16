@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../core/core.php';
 require_once __DIR__ . '/../controllers/ProductController.php';
+require_once __DIR__ . '/../controllers/CartController.php';
 
 $controller = new ProductController();
 
@@ -22,6 +23,15 @@ if ($catId !== false) {
     $isFiltered = true;
 } else {
     $products = $controller->getFeaturedProducts(6);
+}
+
+$recent = [];
+$recommended = [];
+
+if (!$isFiltered && is_logged_in()) {
+    $orderController = new CartController();
+    $recent = $orderController->getRecentlyPurchased((int) $_SESSION['customer_id'], 4);
+    $recommended = $orderController->getRecommendedProducts((int) $_SESSION['customer_id'], 4);
 }
 
 $pageTitle = $isFiltered ? $heading : 'Home';
@@ -55,6 +65,28 @@ include __DIR__ . '/layout/header.php';
                     <?php include __DIR__ . '/layout/product_card.php'; ?>
                 <?php } ?>
             </div>
+        <?php } ?>
+
+        <?php if (!empty($recent)) { ?>
+            <section class="recommend">
+                <h2>Recently purchased</h2>
+                <div class="product-grid">
+                    <?php foreach ($recent as $product) { ?>
+                        <?php include __DIR__ . '/layout/product_card.php'; ?>
+                    <?php } ?>
+                </div>
+            </section>
+        <?php } ?>
+
+        <?php if (!empty($recent) && !empty($recommended)) { ?>
+            <section class="recommend">
+                <h2>Recommended for you</h2>
+                <div class="product-grid">
+                    <?php foreach ($recommended as $product) { ?>
+                        <?php include __DIR__ . '/layout/product_card.php'; ?>
+                    <?php } ?>
+                </div>
+            </section>
         <?php } ?>
     </section>
 </div>

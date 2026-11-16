@@ -51,6 +51,7 @@ $searchValue = isset($_GET['user_query']) ? trim($_GET['user_query']) : '';
             <?php } else { ?>
                 <span class="welcome">Welcome, <?php echo htmlspecialchars($_SESSION['customer_name'] ?? 'Customer'); ?></span>
                 <a href="<?php echo BASE_URL; ?>/views/account/my_account.php">My Account</a>
+                <a href="<?php echo BASE_URL; ?>/views/account/my_orders.php">My Orders</a>
                 <a href="<?php echo BASE_URL; ?>/logout.php">Logout</a>
             <?php } ?>
         </nav>

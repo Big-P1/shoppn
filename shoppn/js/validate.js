@@ -80,7 +80,7 @@
     }
 
     function updatePasswordRules(form) {
-        const password = value(form, 'password');
+        const password = value(form, form.dataset.passwordField || 'password');
         Object.keys(passwordRules).forEach(function (rule) {
             const item = form.querySelector('[data-rule="' + rule + '"]');
             if (!item) { return; }
@@ -146,6 +146,69 @@
         return valid;
     }
 
+    function validateAccount(form) {
+        let valid = true;
+
+        const name = value(form, 'name').trim();
+        if (name.length < 2) { showError(form, 'name', 'Please enter your full name.'); valid = false; }
+        else if (name.length > 100) { showError(form, 'name', 'Name must be 100 characters or fewer.'); valid = false; }
+
+        if (value(form, 'country') === '') { showError(form, 'country', 'Please select your country.'); valid = false; }
+
+        const city = value(form, 'city').trim();
+        if (city.length < 2) { showError(form, 'city', 'Please enter your city.'); valid = false; }
+        else if (city.length > 30) { showError(form, 'city', 'City must be 30 characters or fewer.'); valid = false; }
+
+        if (!phoneRegex.test(value(form, 'contact').trim())) {
+            showError(form, 'contact', 'Enter 7 to 15 digits. +, - and spaces are allowed.');
+            valid = false;
+        }
+
+        if (!checkImage(form, 'customer_image', false)) { valid = false; }
+
+        return valid;
+    }
+
+    function validatePasswordChange(form) {
+        let valid = true;
+
+        const current = value(form, 'current_password');
+        const next = value(form, 'new_password');
+
+        if (current === '') { showError(form, 'current_password', 'Please enter your current password.'); valid = false; }
+
+        if (!passwordStrong(next)) {
+            showError(form, 'new_password', 'Password does not meet all the requirements.');
+            valid = false;
+        } else if (next === current) {
+            showError(form, 'new_password', 'Your new password must be different from the current one.');
+            valid = false;
+        }
+
+        if (value(form, 'confirm_password') !== next) {
+            showError(form, 'confirm_password', 'The passwords do not match.');
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    function validateDelete(form) {
+        let valid = true;
+
+        if (value(form, 'password') === '') {
+            showError(form, 'password', 'Please enter your password.');
+            valid = false;
+        }
+
+        if (!form.elements['confirm'].checked) {
+            showError(form, 'confirm', 'Please tick the box to confirm.');
+            valid = false;
+        }
+
+        return valid;
+    }
+
     function validateNameForm(form) {
         const field = form.dataset.nameField;
         const label = form.dataset.nameLabel || 'Name';
@@ -184,7 +247,10 @@
     const validators = {
         'register-form': validateRegister,
         'login-form': validateLogin,
-        'product-form': validateProduct
+        'product-form': validateProduct,
+        'account-form': validateAccount,
+        'password-form': validatePasswordChange,
+        'delete-form': validateDelete
     };
 
     function attach(form, validator) {
@@ -287,13 +353,16 @@
             attach(form, validateNameForm);
         });
 
-        const register = document.getElementById('register-form');
-        if (register) {
-            register.elements['password'].addEventListener('input', function () {
-                updatePasswordRules(register);
-            });
-            updatePasswordRules(register);
-        }
+        document.querySelectorAll('form').forEach(function (form) {
+            if (!form.querySelector('[data-rule]')) { return; }
+            const field = form.elements[form.dataset.passwordField || 'password'];
+            if (field) {
+                field.addEventListener('input', function () {
+                    updatePasswordRules(form);
+                });
+            }
+            updatePasswordRules(form);
+        });
 
         const productForm = document.getElementById('product-form');
         if (productForm && productForm.elements['product_image']) {

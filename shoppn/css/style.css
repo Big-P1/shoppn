@@ -679,3 +679,41 @@ body { background:linear-gradient(180deg,#fff5f9 0,#fff9f7 320px); }
 .cart-actions button.btn { font-family:inherit; }
 .cart-actions button.btn-outline { background:#fff; color:var(--brand); }
 .cart-actions button.btn-outline:hover { background:#fff0f6; }
+
+.checkout-grid { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:20px; align-items:start; }
+.panel { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:18px 20px; box-shadow:0 5px 25px rgba(94,35,65,.045); }
+.panel h3 { margin:0 0 12px; color:var(--plum); }
+.detail-list { margin:0; display:grid; gap:4px; }
+.detail-list dt { font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin-top:8px; }
+.detail-list dd { margin:0; font-weight:600; word-break:break-word; }
+.payment-page code { background:#fff; padding:1px 6px; border-radius:6px; }
+.alert-error code { background:rgba(255,255,255,.7); }
+
+.invoice { background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px; box-shadow:0 5px 25px rgba(94,35,65,.045); }
+.invoice-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:16px; }
+.invoice-head h2 { margin:0 0 4px; }
+.invoice-head p { margin:0; }
+.status-pill { background:var(--ok-bg); color:var(--ok); font-weight:700; padding:4px 14px; border-radius:999px; font-size:.85rem; }
+.invoice-meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-bottom:18px; padding:14px; background:#fff7fa; border-radius:var(--radius); }
+.invoice-meta div { display:flex; flex-direction:column; gap:2px; word-break:break-word; }
+.invoice-meta .label { font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+
+.recommend { margin-top:32px; }
+.recommend h2, .recommend h3 { color:var(--plum); letter-spacing:-.02em; }
+
+.account-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+.btn-danger { color:var(--danger); border-color:var(--danger); }
+.btn-danger:hover { background:var(--danger-bg); }
+.check-label { display:flex; align-items:center; gap:8px; font-weight:400; }
+.check-label input { width:18px; height:18px; accent-color:var(--brand); }
+.field input:disabled { background:#f6eef2; color:var(--muted); cursor:not-allowed; }
+
+@media (max-width:800px) {
+    .checkout-grid { grid-template-columns:1fr; }
+}
+
+@media print {
+    .site-header, .cart-bar, .site-footer, .no-print { display:none !important; }
+    body { background:#fff; }
+    .invoice { border:0; box-shadow:none; padding:0; }
+}

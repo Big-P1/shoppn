@@ -11,6 +11,26 @@ ini_set('error_log', __DIR__ . '/../error/error.log');
 require_once __DIR__ . '/db_cred.php';
 require_once __DIR__ . '/db_class.php';
 
+$paystackCred = __DIR__ . '/paystack_cred.php';
+
+if (is_file($paystackCred)) {
+    require_once $paystackCred;
+}
+
+unset($paystackCred);
+
+if (!defined('PAYSTACK_PUBLIC_KEY')) {
+    define('PAYSTACK_PUBLIC_KEY', '');
+}
+
+if (!defined('PAYSTACK_SECRET_KEY')) {
+    define('PAYSTACK_SECRET_KEY', '');
+}
+
+if (!defined('PAYSTACK_API_BASE')) {
+    define('PAYSTACK_API_BASE', 'https://api.paystack.co');
+}
+
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
 if (strpos($host, 'localhost') === 0 || strpos($host, '127.0.0.1') === 0) {
@@ -120,5 +140,59 @@ function require_admin() {
         $_SESSION['error'] = 'You do not have permission to access that page.';
         redirect(BASE_URL . '/index.php');
     }
+}
+
+function clean_input($value) {
+    return trim(strip_tags((string) ($value ?? '')));
+}
+
+function password_is_strong($password) {
+    return strlen($password) >= 8
+        && preg_match('/[A-Z]/', $password)
+        && preg_match('/[a-z]/', $password)
+        && preg_match('/[0-9]/', $password)
+        && preg_match('/[^A-Za-z0-9]/', $password);
+}
+
+function paystack_configured() {
+    return strpos(PAYSTACK_PUBLIC_KEY, 'pk_') === 0
+        && strpos(PAYSTACK_SECRET_KEY, 'sk_') === 0
+        && stripos(PAYSTACK_PUBLIC_KEY . PAYSTACK_SECRET_KEY, 'YOUR') === false;
+}
+
+function create_payment_reference() {
+    $reference = 'SHP' . (int) ($_SESSION['customer_id'] ?? 0) . '-' . time() . '-' . bin2hex(random_bytes(4));
+    $_SESSION['pay_ref'] = $reference;
+
+    return $reference;
+}
+
+function render_to_string($file, array $vars = []) {
+    extract($vars, EXTR_SKIP);
+    ob_start();
+    include $file;
+
+    return ob_get_clean();
+}
+
+function send_html_mail($to, $subject, $html) {
+    if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        return false;
+    }
+
+    $domain = preg_replace('/[^A-Za-z0-9.\-]/', '', $_SERVER['SERVER_NAME'] ?? 'localhost');
+    $headers = [
+        'MIME-Version: 1.0',
+        'Content-Type: text/html; charset=UTF-8',
+        'From: Shoppn <no-reply@' . ($domain !== '' ? $domain : 'localhost') . '>'
+    ];
+
+    $sent = @mail($to, $subject, $html, implode("\r\n", $headers));
+
+    if (!$sent) {
+        error_log('Receipt email could not be sent to ' . $to);
+    }
+
+    return $sent;
 }
 ?>
